@@ -14,7 +14,7 @@ elab:
 	xelab $(SIM) > elab.log 2>&1
 
 run:
-	xsim $(SIM) 2>&1 | tee run.log
+	xsim $(SIM) -R 2>&1 | tee run.log
 
 clean:
 	rm -rf xsim.dir logs *.pb *.jou *.wdb *.log 

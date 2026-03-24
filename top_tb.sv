@@ -1,18 +1,30 @@
-module top_tb();
+module top_tb;
+    
+    bit clk;
+    bit rstn;
 
-logic CLK;
-logic RST;
+    
+    always #5 clk = ~clk; 
 
-	top top_module(
-	.CLK(CLK),
-	.RST(RST)
-	);	
+    initial begin
+        
+        $display("[%0t] Simulation started", $time);
+        
+        rstn = 0; 
+        $display("[%0t] Reset asserted", $time);
+        
+        #20;      
+        
+        rstn = 1; 
+        $display("[%0t] Reset deasserted", $time);
 
-initial begin
-        CLK = 0;
-        forever #5 CLK = ~CLK;
-end
+        $finish;
+    end
 
+    
+    top u_top (
+        .clk  (clk),
+        .rstn (rstn)
+    );
 
-	
 endmodule

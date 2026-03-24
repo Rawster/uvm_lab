@@ -1,14 +1,12 @@
-module top(
-input CLK,
-input RST
-
+module top (
+    input bit clk,   
+    input bit rstn
 );
 
-
-	dut dut_inst(
-		.CLK(CLK),
-		.RST(RST)
-	);			
-	
+    
+    dut u_dut (
+        .clk  (clk), 
+        .rstn (rstn)
+    );
 
 endmodule
