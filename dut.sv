@@ -1,3 +1,5 @@
+`timescale 1ns / 10ps
+
 module dut (
     input  bit       clk,
     input  bit       rstn,
@@ -10,7 +12,7 @@ module dut (
     wire sck, si, so, ceb, wpb, holdb;
 
     
-    flash flash_inst (
+    SST25WF020A flash_inst (
         .SCK   (sck),   
         .SI    (si),    
         .SO    (so),    

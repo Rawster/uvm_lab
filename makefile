@@ -1,4 +1,4 @@
-SIM = top_tb
+SIM = top
 
 all: simulate
 

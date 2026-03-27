@@ -1,3 +1,5 @@
+`timescale 1ns / 10ps
+
 module top;
     
     wire clk;
@@ -15,8 +17,8 @@ module top;
         .rstn      (rstn),
         .valid     (valid),
         .ready     (ready),
-        .data_to   (cmd_data),
-        .data_from (read_data)
+        .cmd_data  (cmd_data),
+        .read_data (read_data)
     );
 
     
