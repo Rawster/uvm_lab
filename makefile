@@ -1,4 +1,5 @@
-SIM = top_tb
+SIM = top
+WAVE = 0
 
 all: simulate
 
@@ -11,10 +12,15 @@ comp_tb:
 	xvlog -sv -f verif.f > compile_tb.log 2>&1
 
 elab:
-	xelab $(SIM) > elab.log 2>&1
+	xelab -debug typical $(SIM) > elab.log 2>&1
 
 run:
-	xsim $(SIM) -R 2>&1 | tee run.log
+ifeq ($(WAVE), 1)
+	xsim $(SIM) -tclbatch run.tcl 2>&1 | tee run.log
+	xsim work.$(SIM).wdb -gui -view wave_conf.wcfg
+else
+	xsim $(SIM) -tclbatch run.tcl -R 2>&1 | tee run.log
+endif
 
 clean:
-	rm -rf xsim.dir logs *.pb *.jou *.wdb *.log 
+	rm -rf xsim.dir logs *.pb *.jou *.wdb *.log
