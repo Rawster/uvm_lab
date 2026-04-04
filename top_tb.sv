@@ -34,10 +34,11 @@ module top_tb (
 
         if (read_data == 8'h62) begin
             $display("---------------------------------------");
-            $display("SUCCESS: Odebrano ID 62h (SANYO)!");
+            #display("TEST 1: READ MANUFACTURER CODE")
+            $display("SUCCESS: Received ID 62h (SANYO)!");
             $display("---------------------------------------");
         end else begin
-            $error("ERROR: Oczekiwano 62h, otrzymano %h", read_data);
+            $error("ERROR: Expected 62h, received %h", read_data);
         end
       //TEST 2 READ MEMORY
 
@@ -57,11 +58,39 @@ module top_tb (
 
         if (read_data == 8'h01) begin
             $display("---------------------------------------");
-            $display("SUCCESS: Odebrano 0x01!");
+            #display("TEST 2: READ FROM MEMORY")
+            $display("SUCCESS: Received 0x01!");
             $display("---------------------------------------");
         end else begin
-            $error("ERROR: Oczekiwano 0x01, otrzymano %h", read_data);
+            $error("ERROR: Expected 0x01, received %h", read_data);
         end
+
+
+        //TEST 3 READ STATUS register
+
+        wait(ready == 1);
+
+        @(posedge clk);
+        cmd_data     = 8'h05;        
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+
+   
+        wait(ready == 1);
+        #10;
+
+        if (read_data == 8'h80) begin
+            $display("---------------------------------------");
+            #display("TEST 3: SETUP REGISTER")
+            $display("SUCCESS: Received b'10000000!");
+            $display("---------------------------------------");
+        end else begin
+            $error("ERROR: Expectedb'10000000, received %b", read_data);
+        end
+
+        
 
 
         $display("[%0t] Simulation finished", $time);
