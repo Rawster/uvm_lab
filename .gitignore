@@ -3,3 +3,4 @@ logs/
 *.jou
 *.wdb
 *.log 
+*.dir
