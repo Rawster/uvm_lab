@@ -7,6 +7,7 @@ module dut (
     output bit       ready,
     input  bit [7:0] data_in,
     input  bit [23:0] data_in_address,
+    input  bit [7:0] data_in_data,
     output bit [7:0] data_out
 );
     
@@ -38,6 +39,7 @@ module dut (
         .ceb    (ceb),
         .wpb    (wpb),
         .holdb  (holdb),
-        .d_in_address (data_in_address)
+        .d_in_address (data_in_address),
+        .d_in_data(data_in_data)
     );
 endmodule

@@ -6,6 +6,7 @@ module controller (
     output logic ready,
     input  bit [7:0] d_in,
     input  bit [23:0] d_in_address,
+    input  bit [7:0] d_in_data,
     output logic [7:0] d_out,
     output logic si, ceb =1, wpb, holdb,
     output logic sck = 0,
@@ -20,7 +21,7 @@ module controller (
     logic [5:0] count_address;   
 
 
-    typedef enum logic [2:0] {IDLE, COMMAND_TRANSMIT, ADDRESS_TRANSMIT, RECEIVE, FINISH} state_5;
+    typedef enum logic [2:0] {IDLE, COMMAND_TRANSMIT, ADDRESS_TRANSMIT, ADDRESS_TRANSMIT_PURGE, RECEIVE, WRITE, FINISH} state_5;
     state_5 state = IDLE;
 
     assign ready = (state == IDLE);
@@ -39,19 +40,18 @@ module controller (
         else begin
 
             case (state)
-
+                //wait for command
                 IDLE: begin
-                    ceb   <= 1;
-
+                    ceb   <= 0;
+                    
                     if (valid) begin
-                        state <= COMMAND_TRANSMIT;
-                        ceb   <= 0;    
+                        state <= COMMAND_TRANSMIT;    
                         phase_clk <= 0;    
                         count <= 7;
                         count_address <= 23;
                     end
                 end
-
+                //receive command
                 COMMAND_TRANSMIT: begin
                     
                     if(phase_clk == 0) begin
@@ -68,26 +68,60 @@ module controller (
                         sck <= 1;
 
                         if(count == 0) begin
-
                             count <= 7;
+                            count_address <= 23;
 
-                            if (d_in == 8'h03) begin
-                                state <= ADDRESS_TRANSMIT;
-                            end
-
-                            else begin
-                                state <= RECEIVE;
-                                
-                            end 
-
+                            case (d_in)
+                                8'h03, 8'h02: state <= ADDRESS_TRANSMIT;       
+                                8'h06:        state <= FINISH;                 
+                                8'h20:        state <= ADDRESS_TRANSMIT_PURGE; 
+                                default:      state <= RECEIVE;                
+                            endcase
                         end
                         else count <= count - 1;
 
                     end
                     
                 end
-
+                //transmiting address to read from or write to
                 ADDRESS_TRANSMIT: begin
+
+                    if(phase_clk == 0) begin
+                        
+                        si <= d_in_address[count_address];
+                        phase_clk <= 1;
+                        sck <= 0;
+
+
+                    end
+
+                    else begin
+                        phase_clk <= 0;
+                        sck <= 1;
+
+                        if(count_address == 0) begin
+                            
+                            if(d_in == 8'h02) begin
+                                state <= WRITE;
+                            end
+
+                            else begin
+                                state <= RECEIVE;
+                            end
+
+                            count_address <= 23;
+                            count <=7 ;
+
+
+                        end
+                        else count_address <= count_address - 1;
+
+                    end
+                    
+                end
+
+                //transmiting address to purge or write
+                ADDRESS_TRANSMIT_PURGE: begin
 
                     if(phase_clk == 0) begin
                         
@@ -105,7 +139,7 @@ module controller (
                         if(count_address == 0) begin
 
                             count_address <= 23;
-                            state <= RECEIVE;
+                            state <= FINISH;
 
                         end
                         else count_address <= count_address - 1;
@@ -114,7 +148,7 @@ module controller (
                     
                 end
     
-
+                //receiving data
                 RECEIVE: begin
                 
                     if(phase_clk == 0) begin
@@ -143,11 +177,38 @@ module controller (
 
                 end
 
+                WRITE: begin
+
+                    if(phase_clk == 0) begin
+                        
+                        si <= d_in_data[count];
+                        phase_clk <= 1;
+                        sck <= 0;
+
+                    end
+
+                    else begin
+
+                        phase_clk <= 0;
+                        sck <= 1;
+
+                        if(count == 0) begin
+
+                            count <= 7;
+                            state <= FINISH;
+
+
+                        end
+                    
+                        else count <= count - 1;
+                    end
+                end
+                //last clock cycle, reset
                 FINISH: begin
 
                     ceb <= 1;
                     phase_clk <= 0;
-                    sck <= 1;
+                    sck <= 0;
                     state <= IDLE;
 
                 end
