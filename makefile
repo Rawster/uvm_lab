@@ -1,6 +1,6 @@
 SIM = top
 WAVE = 0
-DEFINES = -d datain -d statusin
+DEFINES = -d datain -d statusin -d shortsim
 
 all: simulate
 

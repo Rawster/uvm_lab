@@ -12,6 +12,15 @@ module controller (
     output logic sck = 0,
     input  bit so 
 );
+
+
+    localparam write_command = 8'h02;;
+    localparam read_command  = 8'h03;
+    localparam read_register_command = 8'h05;
+    localparam purge_command = 8'h20;
+    localparam read_manufacturer_command = 8'h9F;
+    localparam enable_write_command = 8'h06;
+
     assign wpb   = 1'b1; 
     assign holdb = 1'b1; 
 
@@ -21,8 +30,8 @@ module controller (
     logic [5:0] count_address;   
 
 
-    typedef enum logic [2:0] {IDLE, COMMAND_TRANSMIT, ADDRESS_TRANSMIT, ADDRESS_TRANSMIT_PURGE, RECEIVE, WRITE, FINISH} state_5;
-    state_5 state = IDLE;
+    typedef enum logic [2:0] {IDLE, COMMAND_TRANSMIT, ADDRESS_TRANSMIT, ADDRESS_TRANSMIT_PURGE, RECEIVE, WRITE, FINISH} state_e;
+    state_e state = IDLE;
 
     assign ready = (state == IDLE);
 
@@ -72,10 +81,10 @@ module controller (
                             count_address <= 23;
 
                             case (d_in)
-                                8'h03, 8'h02: state <= ADDRESS_TRANSMIT;       
-                                8'h06:        state <= FINISH;                 
-                                8'h20:        state <= ADDRESS_TRANSMIT_PURGE; 
-                                default:      state <= RECEIVE;                
+                                read_command, write_command: state <= ADDRESS_TRANSMIT;       
+                                enable_write_command:        state <= FINISH;                 
+                                purge_command:               state <= ADDRESS_TRANSMIT_PURGE; 
+                                default:                     state <= RECEIVE;                
                             endcase
                         end
                         else count <= count - 1;
@@ -101,7 +110,7 @@ module controller (
 
                         if(count_address == 0) begin
                             
-                            if(d_in == 8'h02) begin
+                            if(d_in == write_command) begin
                                 state <= WRITE;
                             end
 

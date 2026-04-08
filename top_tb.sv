@@ -175,21 +175,21 @@ module top_tb (
         end while (read_data[0] == 1);
 
    
-        valid = 0;          // 1. Wyłączasz valid
-        wait(ready == 1);   // 2. Czekasz aż sterownik będzie gotowy
-        @(posedge clk);     // 3. WYMUSZASZ JEDEN TAKT PRZERWY (Tutaj CEB pójdzie na 1)
+        valid = 0;          
+        wait(ready == 1);   
+        @(posedge clk);     
         
-        // --- TERAZ DOPIERO ODCZYT PAMIĘCI ---
+        
         cmd_data     = 8'h03;        
         address_data = 24'h000001; 
-        valid        = 1;   // Teraz dajesz valid na nową komendę
+        valid        = 1;   
 
         @(posedge clk);
         valid    = 0;
-        // ---------------------------------
+       
 
         wait(ready == 1);
-        #10; // Czas na ustabilizowanie read_data
+        #10; 
 
 
         if (read_data == 8'h55) begin
