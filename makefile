@@ -1,15 +1,16 @@
 SIM = top
 WAVE = 0
+DEFINES = -d datain -d statusin -d shortsim
 
 all: simulate
 
 simulate: comp_rtl comp_tb elab run
 
 comp_rtl:
-	xvlog -sv -f rtl.f > compile_rtl.log 2>&1
+	xvlog -sv $(DEFINES) -f rtl.f > compile_rtl.log 2>&1
 
 comp_tb:
-	xvlog -sv -f verif.f > compile_tb.log 2>&1
+	xvlog -sv $(DEFINES) -f verif.f > compile_tb.log 2>&1
 
 elab:
 	xelab -debug typical $(SIM) > elab.log 2>&1
@@ -23,4 +24,4 @@ else
 endif
 
 clean:
-	rm -rf xsim.dir logs *.pb *.jou *.wdb *.log
+	rm -rf xsim.dir logs *.pb *.jou *.wdb *.log *.str

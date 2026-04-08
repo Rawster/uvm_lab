@@ -10,13 +10,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="666.27 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,550.28 ns"></ZoomEndTime>
-      <Cursor1Time time="813.60 ns"></Cursor1Time>
+      <ZoomStartTime time="0.00 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,265.00 ns"></ZoomEndTime>
+      <Cursor1Time time="682.02 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="276"></NameColumnWidth>
-      <ValueColumnWidth column_width="116"></ValueColumnWidth>
+      <ValueColumnWidth column_width="108"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="11" />
    <wvobject type="array" fp_name="/top/dut_inst/data_in">
@@ -27,13 +27,9 @@
       <obj_property name="ElementShortName">data_out[7:0]</obj_property>
       <obj_property name="ObjectShortName">data_out[7:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/sck">
-      <obj_property name="ElementShortName">sck</obj_property>
-      <obj_property name="ObjectShortName">sck</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/si">
-      <obj_property name="ElementShortName">si</obj_property>
-      <obj_property name="ObjectShortName">si</obj_property>
+   <wvobject type="logic" fp_name="/top/dut_inst/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/top/dut_inst/ceb">
       <obj_property name="ElementShortName">ceb</obj_property>
@@ -55,12 +51,16 @@
       <obj_property name="ElementShortName">data_out[7:0]</obj_property>
       <obj_property name="ObjectShortName">data_out[7:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
+   <wvobject type="logic" fp_name="/top/dut_inst/sck">
+      <obj_property name="ElementShortName">sck</obj_property>
+      <obj_property name="ObjectShortName">sck</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/top/dut_inst/so">
       <obj_property name="ElementShortName">so</obj_property>
       <obj_property name="ObjectShortName">so</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top/dut_inst/si">
+      <obj_property name="ElementShortName">si</obj_property>
+      <obj_property name="ObjectShortName">si</obj_property>
    </wvobject>
 </wave_config>
