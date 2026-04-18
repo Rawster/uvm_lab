@@ -30,7 +30,7 @@ else
 endif
 
 ifeq ($(COV), 1)
-	xcrg -cov_db_dir cov_dir/xsim.codeCov -cov_db_name CC_DB1 -report_dir report
+	xcrg -cov_db_dir cov_dir -cov_db_name CC_DB1 -report_dir report
 endif
 
 

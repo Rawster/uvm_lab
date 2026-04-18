@@ -11,6 +11,9 @@ module top_tb (
     input  bit [7:0]  read_data    
 );
     
+    bit [23:0] random_address_data = $random();
+    bit [7:0]  random_write_data   = $random();
+    bit [7:0]  random_read_data    = $random();
 
 
     // Zegar
@@ -90,7 +93,7 @@ module top_tb (
         end else begin
             $error("ERROR: Expectedb'10000000, received %b", read_data);
         end
-
+//test start
         //TEST 4 PURGE AND WRITE 1 BYTE
 
         //send write enable
@@ -200,8 +203,238 @@ module top_tb (
         end else begin
             $error("ERROR: Expected 0x55 received %h", read_data);
         end
+//test end
+
+        //duplicated test for test coverage
 
 
+//test start
+        //TEST 4 PURGE AND WRITE 1 BYTE
+
+        //send write enable
+        wait(ready == 1);
+
+        @(posedge clk);
+        
+        cmd_data     = 8'h06;        
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+
+   
+        wait(ready == 1);
+        @(posedge clk);
+        //send purge
+        wait(ready == 1);
+
+        @(posedge clk);
+        
+        cmd_data     = 8'h20;
+        address_data = random_address_data;        
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+
+        
+        wait(ready == 1);
+        @(posedge clk);
+
+        //wait for purge to be done
+        do begin
+            @(posedge clk);
+            cmd_data = 8'h05; valid = 1; // Read Status
+            @(posedge clk);
+            valid = 0;
+            wait(ready == 1);
+            #10000;
+            if (read_data[0] == 1) 
+                $display("[%0t] Flash is still BUSY...", $time);
+        end while (read_data[0] == 1); 
+        @(posedge clk);
+        //send write enable
+        wait(ready == 1);
+
+        @(posedge clk);
+        
+        cmd_data     = 8'h06;        
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+        $display("[%0t] write enable sent", $time);
+        @(posedge clk);
+        //write data
+        wait(ready == 1);
+
+       
+        
+        cmd_data     = 8'h02;
+        address_data = random_address_data; 
+        write_data = random_write_data;  
+         @(posedge clk);      
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+
+        wait(ready == 1);
+
+        do begin
+            @(posedge clk);
+            cmd_data = 8'h05; valid = 1; // Read Status
+            @(posedge clk);
+            valid = 0;
+            wait(ready == 1);
+            #10;
+            if (read_data[0] == 1) 
+                $display("[%0t] Flash is still PROGRAMMING...", $time);
+        end while (read_data[0] == 1);
+
+   
+        valid = 0;          
+        wait(ready == 1);   
+        @(posedge clk);     
+        
+        
+        cmd_data     = 8'h03;        
+        address_data = random_address_data; 
+        valid        = 1;   
+
+        @(posedge clk);
+        valid    = 0;
+       
+
+        wait(ready == 1);
+        #10; 
+
+
+        if (read_data == random_write_data) begin
+            $display("---------------------------------------");
+            $display("TEST 4: WRITE");
+            $display("SUCCESS: Received same as Written ", read_data);
+            $display("---------------------------------------");
+        end else begin
+            $error("ERROR: Received %h", read_data);
+        end
+//test end
+
+
+        //duplicated test for test coverage
+
+
+//test start
+        //TEST 4 PURGE AND WRITE 1 BYTE
+
+        //send write enable
+        wait(ready == 1);
+
+        @(posedge clk);
+        
+        cmd_data     = 8'h06;        
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+
+   
+        wait(ready == 1);
+        @(posedge clk);
+        //send purge
+        wait(ready == 1);
+
+        @(posedge clk);
+        
+        cmd_data     = 8'h20;
+        address_data = random_address_data;        
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+
+        
+        wait(ready == 1);
+        @(posedge clk);
+
+        //wait for purge to be done
+        do begin
+            @(posedge clk);
+            cmd_data = 8'h05; valid = 1; // Read Status
+            @(posedge clk);
+            valid = 0;
+            wait(ready == 1);
+            #10000;
+            if (read_data[0] == 1) 
+                $display("[%0t] Flash is still BUSY...", $time);
+        end while (read_data[0] == 1); 
+        @(posedge clk);
+        //send write enable
+        wait(ready == 1);
+
+        @(posedge clk);
+        
+        cmd_data     = 8'h06;        
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+        $display("[%0t] write enable sent", $time);
+        @(posedge clk);
+        //write data
+        wait(ready == 1);
+
+       
+        
+        cmd_data     = 8'h02;
+        address_data = random_address_data; 
+        write_data = random_write_data;  
+         @(posedge clk);      
+        valid    = 1;
+
+        @(posedge clk);
+        valid    = 0;
+
+        wait(ready == 1);
+
+        do begin
+            @(posedge clk);
+            cmd_data = 8'h05; valid = 1; // Read Status
+            @(posedge clk);
+            valid = 0;
+            wait(ready == 1);
+            #10;
+            if (read_data[0] == 1) 
+                $display("[%0t] Flash is still PROGRAMMING...", $time);
+        end while (read_data[0] == 1);
+
+   
+        valid = 0;          
+        wait(ready == 1);   
+        @(posedge clk);     
+        
+        
+        cmd_data     = 8'h03;        
+        address_data = random_address_data; 
+        valid        = 1;   
+
+        @(posedge clk);
+        valid    = 0;
+       
+
+        wait(ready == 1);
+        #10; 
+
+
+        if (read_data == random_write_data) begin
+            $display("---------------------------------------");
+            $display("TEST 4: WRITE");
+            $display("SUCCESS: Received same as Written ", read_data);
+            $display("---------------------------------------");
+        end else begin
+            $error("ERROR: Received %h", read_data);
+        end
+//test end
         
 
 
