@@ -1,5 +1,8 @@
 `timescale 1ns / 10ps
 
+`include "uvm_macros.svh"
+
+
 module top_tb (
     output bit        clk,
     output bit        rstn,
@@ -10,7 +13,7 @@ module top_tb (
     output bit [7:0]  write_data,
     input  bit [7:0]  read_data    
 );
-    
+    import uvm_pkg::*;
     bit [23:0] random_address_data = $random();
     bit [7:0]  random_write_data   = $random();
     bit [7:0]  random_read_data    = $random();
@@ -439,6 +442,9 @@ module top_tb (
 
 
         $display("[%0t] Simulation finished", $time);
+
+        `uvm_info("TEST","Hello World!",UVM_MEDIUM);
+
         $finish;
     end
 

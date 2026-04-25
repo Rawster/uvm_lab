@@ -1,0 +1,8 @@
+`include "uvm_macros.svh"
+
+`include "tests/uvm_sequence_item"
+`include "seq/uvm_sequencer"
+`include "uvm_driver"
+`include "uvm_env"
+
+import uvm_pkg::*;
