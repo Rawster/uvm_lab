@@ -1,8 +1,17 @@
+package project_package;
+
 `include "uvm_macros.svh"
 
-`include "tests/uvm_sequence_item"
-`include "seq/uvm_sequencer"
+`include "uvm_sequence_item"
+`include "uvm_sequencer"
 `include "uvm_driver"
 `include "uvm_env"
 
+
+
+endpackage
+
 import uvm_pkg::*;
+
+
+
