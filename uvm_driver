@@ -24,22 +24,88 @@ class driver extends uvm_driver #(mem_seq_item);
             
             `uvm_info("DRIVER", $sformatf("Odebrano sekwencję -> CMD: %0h, ADDR: %0h, DATA: %0h", 
                                            req.command, req.address, req.data), UVM_LOW)
+
+
+
+            vif.read_data[0] = 0;
             vif.rstn = 1;
-            wait(vif.ready == 1);
             @(posedge vif.clk);
 
-            vif.cmd_data     = req.command;        
-            vif.address_data = req.address;
-            vif.write_data   = req.data;
-            vif.valid        = 1;
+            //check if memory busy
+            do begin
+			
+                wait(vif.ready == 1);
+                @(posedge vif.clk);
+                vif.cmd_data     = 5;
+                vif.valid        = 1;
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                vif.valid        = 0;
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                wait(vif.ready == 1);
 
-            @(posedge vif.clk);
-            @(posedge vif.clk);
-            vif.valid        = 0;
+		    end while (vif.read_data[0] != 0);
+            
 
-            @(posedge vif.clk);
-            @(posedge vif.clk);
-            wait(vif.ready === 1'b1);
+
+
+
+            //send read command
+            if (req.command == 8'h03) begin
+
+                wait(vif.ready == 1);
+                @(posedge vif.clk);
+                vif.cmd_data     = req.command;        
+                vif.address_data = req.address;
+                vif.write_data   = req.data;
+                vif.valid        = 1;
+
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                vif.valid        = 0;
+
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                wait(vif.ready === 1'b1);
+
+            end
+
+
+            //send write command
+
+            if (req.command == 8'h02) begin
+                //set write
+                wait(vif.ready == 1);
+                @(posedge vif.clk);
+                vif.cmd_data     = 8'h06;        
+                vif.valid        = 1;
+
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                vif.valid        = 0;
+
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                //write command
+                wait(vif.ready === 1'b1);
+                @(posedge vif.clk);
+                vif.cmd_data     = req.command;        
+                vif.address_data = req.address;
+                vif.write_data   = req.data;
+                vif.valid        = 1;
+
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                vif.valid        = 0;
+
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                wait(vif.ready === 1'b1);
+
+            end
+
+
 
             #2000;
             seq_item_port.item_done();

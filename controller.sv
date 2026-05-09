@@ -14,7 +14,7 @@ module controller (
 );
 
 
-    localparam write_command = 8'h02;;
+    localparam write_command = 8'h02;
     localparam read_command  = 8'h03;
     localparam read_register_command = 8'h05;
     localparam purge_command = 8'h20;
