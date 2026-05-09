@@ -11,15 +11,22 @@ class base_sequence extends uvm_sequence#(mem_seq_item);
         
         #100;
 
-       
+       //write sequence
         req = mem_seq_item::type_id::create("req");
         start_item(req);
-        
-        
-        if (!req.randomize() with { command == 8'h9F; }) begin
-            `uvm_error("SEQ", "Błąd randomizacji!")
-        end
-        
+        req.randomize() with { 
+            command == 8'h02;
+            address == 24'h000001;
+            data == 8'haa;
+        };
+        finish_item(req); 
+        //read sequence
+        req = mem_seq_item::type_id::create("req");
+        start_item(req);
+        req.randomize() with { 
+            command == 8'h03;
+            address == 24'h000001;
+        };
         finish_item(req); 
 
 
