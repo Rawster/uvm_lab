@@ -3,61 +3,68 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="work.top.wdb" id="1">
+      <db_ref path="work.top_tb.wdb" id="1">
          <top_modules>
-            <top_module name="top" />
+            <top_module name="project_package" />
+            <top_module name="std" />
+            <top_module name="top_tb" />
+            <top_module name="uvm_pkg" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.00 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,265.00 ns"></ZoomEndTime>
-      <Cursor1Time time="682.02 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,800.001 ns"></ZoomEndTime>
+      <Cursor1Time time="60.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="276"></NameColumnWidth>
-      <ValueColumnWidth column_width="108"></ValueColumnWidth>
+      <ValueColumnWidth column_width="100"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="11" />
-   <wvobject type="array" fp_name="/top/dut_inst/data_in">
-      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/top/dut_inst/data_out">
-      <obj_property name="ElementShortName">data_out[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_out[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/clk">
+   <wvobject type="logic" fp_name="/top_tb/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/ceb">
-      <obj_property name="ElementShortName">ceb</obj_property>
-      <obj_property name="ObjectShortName">ceb</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/valid">
-      <obj_property name="ElementShortName">valid</obj_property>
-      <obj_property name="ObjectShortName">valid</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/ready">
-      <obj_property name="ElementShortName">ready</obj_property>
-      <obj_property name="ObjectShortName">ready</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/top/dut_inst/data_in">
-      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/top/dut_inst/data_out">
-      <obj_property name="ElementShortName">data_out[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_out[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/sck">
+   <wvobject type="logic" fp_name="/top_tb/dut/sck">
       <obj_property name="ElementShortName">sck</obj_property>
       <obj_property name="ObjectShortName">sck</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/top/dut_inst/so">
-      <obj_property name="ElementShortName">so</obj_property>
-      <obj_property name="ObjectShortName">so</obj_property>
+   <wvobject type="logic" fp_name="/top_tb/dut/ceb">
+      <obj_property name="ElementShortName">ceb</obj_property>
+      <obj_property name="ObjectShortName">ceb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/dut/si">
+      <obj_property name="ElementShortName">si</obj_property>
+      <obj_property name="ObjectShortName">si</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/d_in">
+      <obj_property name="ElementShortName">d_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">d_in[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/d_in_address">
+      <obj_property name="ElementShortName">d_in_address[23:0]</obj_property>
+      <obj_property name="ObjectShortName">d_in_address[23:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/d_in_data">
+      <obj_property name="ElementShortName">d_in_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">d_in_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/d_out">
+      <obj_property name="ElementShortName">d_out[7:0]</obj_property>
+      <obj_property name="ObjectShortName">d_out[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/dut/valid">
+      <obj_property name="ElementShortName">valid</obj_property>
+      <obj_property name="ObjectShortName">valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/dut/ready">
+      <obj_property name="ElementShortName">ready</obj_property>
+      <obj_property name="ObjectShortName">ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/dut/rstn">
+      <obj_property name="ElementShortName">rstn</obj_property>
+      <obj_property name="ObjectShortName">rstn</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/top/dut_inst/si">
       <obj_property name="ElementShortName">si</obj_property>

@@ -27,7 +27,8 @@ module controller (
 
     logic phase_clk;
     logic [2:0] count;        
-    logic [5:0] count_address;   
+    logic [5:0] count_address;
+      
 
 
     typedef enum logic [2:0] {IDLE, COMMAND_TRANSMIT, ADDRESS_TRANSMIT, ADDRESS_TRANSMIT_PURGE, RECEIVE, WRITE, FINISH} state_e;

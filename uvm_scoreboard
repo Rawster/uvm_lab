@@ -1,0 +1,32 @@
+class scoreboard extends uvm_scoreboard;
+    `uvm_component_utils(scoreboard)
+
+    // Port, którym Scoreboard odbiera dane z Monitora
+    uvm_analysis_imp #(mem_seq_item, scoreboard) item_collected_export;
+
+    function new(string name = "scoreboard", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        item_collected_export = new("item_collected_export", this);
+    endfunction
+
+    virtual function void write(mem_seq_item item);
+        
+        if (item.command == 8'h9F) begin
+            if (item.read_data == 8'h62) begin
+                `uvm_info("SCOREBOARD", "SUKCES! Odczytano poprawne ID producenta (62h - SANYO)!", UVM_NONE)
+            end else begin
+                `uvm_error("SCOREBOARD", $sformatf("BLAD! Oczekiwano 62h, otrzymano %0h", item.read_data))
+            end
+        end
+        
+        
+        else if (item.command == 8'h05) begin
+             
+        end
+
+    endfunction
+endclass

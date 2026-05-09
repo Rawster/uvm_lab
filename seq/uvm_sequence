@@ -1,0 +1,28 @@
+class base_sequence extends uvm_sequence#(mem_seq_item);
+    `uvm_object_utils(base_sequence)
+
+    function new(string name = "base_sequence"); 
+        super.new(name); 
+    endfunction
+
+    task body();
+        `uvm_info("SEQ", "Rozpoczynam nadawanie sekwencji...", UVM_LOW)
+
+        
+        #100;
+
+       
+        req = mem_seq_item::type_id::create("req");
+        start_item(req);
+        
+        
+        if (!req.randomize() with { command == 8'h9F; }) begin
+            `uvm_error("SEQ", "Błąd randomizacji!")
+        end
+        
+        finish_item(req); 
+
+
+        `uvm_info("SEQ", "Zakończono nadawanie sekwencji.", UVM_LOW)
+    endtask
+endclass
