@@ -1,8 +1,8 @@
-SIM = top
+SIM = top_tb
 WAVE = 0
 COV = 0
 DEFINES = -d datain -d statusin -d shortsim
-TEST = default
+TEST = base_test
 
 all: simulate
 

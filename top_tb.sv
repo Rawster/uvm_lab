@@ -1,452 +1,70 @@
 `timescale 1ns / 10ps
-
 `include "uvm_macros.svh"
+import uvm_pkg::*;
+import project_package::*; 
 
+interface controller_if(input bit clk);
+    logic rstn;
+    logic valid;
+    logic ready;
+    logic [7:0] cmd_data;
+    logic [23:0] address_data;
+    logic [7:0] write_data;
+    logic [7:0] read_data;
+endinterface
 
-module top_tb (
-    output bit        clk,
-    output bit        rstn,
-    output bit        valid,
-    input  bit        ready,       
-    output bit [7:0]  cmd_data,
-    output bit [23:0] address_data,
-    output bit [7:0]  write_data,
-    input  bit [7:0]  read_data    
-);
-    import uvm_pkg::*;
-    bit [23:0] random_address_data = $random();
-    bit [7:0]  random_write_data   = $random();
-    bit [7:0]  random_read_data    = $random();
-
-
-    // Zegar
+module top_tb;
+    bit clk;
     always #20 clk = ~clk; 
+
+    controller_if vif(clk);
+
+    // 1. Definiujemy "fizyczne ścieżki" na naszej wirtualnej płytce PCB
+    wire spi_sck;
+    wire spi_si;  // MOSI
+    wire spi_so;  // MISO
+    wire spi_ceb; // Chip Select
+    wire spi_wpb; // Write Protect
+    wire spi_holdb; // Hold
+
+    // 2. Instancjacja Twojego kontrolera - podłączamy sygnały SPI!
+    controller dut (
+        .clk(vif.clk),
+        .rstn(vif.rstn),
+        .valid(vif.valid),
+        .ready(vif.ready),
+        .d_in(vif.cmd_data),
+        .d_in_address(vif.address_data),
+        .d_in_data(vif.write_data),
+        .d_out(vif.read_data),
+        
+        // PODŁĄCZENIE FIZYCZNEJ MAGISTRALI SPI:
+        .si(spi_si),
+        .so(spi_so),
+        .sck(spi_sck),
+        .ceb(spi_ceb),
+        .wpb(spi_wpb),
+        .holdb(spi_holdb)
+    );
+
+    // 3. Instancjacja Modelu Pamięci Flash od Microchip
+    SST25WF020A flash_memory (
+        .SCK(spi_sck),
+        .SI(spi_si),
+        .SO(spi_so),
+        .CEB(spi_ceb),
+        .WPB(spi_wpb),
+        .HOLDB(spi_holdb)
+    );
+
     initial begin
-
-        rstn = 1; 
-        wait(ready == 1);
-
-        //TEST 1 READ Manufacturer code
-        $display("[%0t] READ COMMAND", $time);
-        @(posedge clk);
-        cmd_data = 8'h9F;
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-        
-        wait(ready == 1);
-        $display("[%0t] Controler response", $time);
-        #10;
-
-        if (read_data == 8'h62) begin
-            $display("---------------------------------------");
-            $display("TEST 1: READ MANUFACTURER CODE");
-            $display("SUCCESS: Received ID 62h (SANYO)!");
-            $display("---------------------------------------");
-        end else begin
-            $error("ERROR: Expected 62h, received %h", read_data);
-        end
-      //TEST 2 READ MEMORY
-
-        wait(ready == 1);
-
-        @(posedge clk);
-        cmd_data     = 8'h03;        
-        address_data = 24'h000000;
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-   
-        wait(ready == 1);
-        #10;
-
-        if (read_data == 8'h01) begin
-            $display("---------------------------------------");
-            $display("TEST 2: READ FROM MEMORY");
-            $display("SUCCESS: Received 0x01!");
-            $display("---------------------------------------");
-        end else begin
-            $error("ERROR: Expected 0x01, received %h", read_data);
-        end
-
-
-        //TEST 3 READ STATUS register
-
-        wait(ready == 1);
-
-        @(posedge clk);
-        cmd_data     = 8'h05;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-   
-        wait(ready == 1);
-        #10;
-
-        if (read_data == 8'h80) begin
-            $display("---------------------------------------");
-            $display("TEST 3: SETUP REGISTER");
-            $display("SUCCESS: Received b'10000000!");
-            $display("---------------------------------------");
-        end else begin
-            $error("ERROR: Expectedb'10000000, received %b", read_data);
-        end
-//test start
-        //TEST 4 PURGE AND WRITE 1 BYTE
-
-        //send write enable
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h06;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-   
-        wait(ready == 1);
-        @(posedge clk);
-        //send purge
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h20;
-        address_data = 8'h01;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-        
-        wait(ready == 1);
-        @(posedge clk);
-
-        //wait for purge to be done
-        do begin
-            @(posedge clk);
-            cmd_data = 8'h05; valid = 1; // Read Status
-            @(posedge clk);
-            valid = 0;
-            wait(ready == 1);
-            #10000;
-            if (read_data[0] == 1) 
-                $display("[%0t] Flash is still BUSY...", $time);
-        end while (read_data[0] == 1); 
-        @(posedge clk);
-        //send write enable
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h06;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-        $display("[%0t] write enable sent", $time);
-        @(posedge clk);
-        //write data
-        wait(ready == 1);
-
-       
-        
-        cmd_data     = 8'h02;
-        address_data = 8'h01; 
-        write_data = 8'h55;  
-         @(posedge clk);      
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-        wait(ready == 1);
-
-        do begin
-            @(posedge clk);
-            cmd_data = 8'h05; valid = 1; // Read Status
-            @(posedge clk);
-            valid = 0;
-            wait(ready == 1);
-            #10;
-            if (read_data[0] == 1) 
-                $display("[%0t] Flash is still PROGRAMMING...", $time);
-        end while (read_data[0] == 1);
-
-   
-        valid = 0;          
-        wait(ready == 1);   
-        @(posedge clk);     
-        
-        
-        cmd_data     = 8'h03;        
-        address_data = 24'h000001; 
-        valid        = 1;   
-
-        @(posedge clk);
-        valid    = 0;
-       
-
-        wait(ready == 1);
-        #10; 
-
-
-        if (read_data == 8'h55) begin
-            $display("---------------------------------------");
-            $display("TEST 4: WRITE");
-            $display("SUCCESS: Received same as Written 0x55");
-            $display("---------------------------------------");
-        end else begin
-            $error("ERROR: Expected 0x55 received %h", read_data);
-        end
-//test end
-
-        //duplicated test for test coverage
-
-
-//test start
-        //TEST 4 PURGE AND WRITE 1 BYTE
-
-        //send write enable
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h06;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-   
-        wait(ready == 1);
-        @(posedge clk);
-        //send purge
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h20;
-        address_data = random_address_data;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-        
-        wait(ready == 1);
-        @(posedge clk);
-
-        //wait for purge to be done
-        do begin
-            @(posedge clk);
-            cmd_data = 8'h05; valid = 1; // Read Status
-            @(posedge clk);
-            valid = 0;
-            wait(ready == 1);
-            #10000;
-            if (read_data[0] == 1) 
-                $display("[%0t] Flash is still BUSY...", $time);
-        end while (read_data[0] == 1); 
-        @(posedge clk);
-        //send write enable
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h06;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-        $display("[%0t] write enable sent", $time);
-        @(posedge clk);
-        //write data
-        wait(ready == 1);
-
-       
-        
-        cmd_data     = 8'h02;
-        address_data = random_address_data; 
-        write_data = random_write_data;  
-         @(posedge clk);      
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-        wait(ready == 1);
-
-        do begin
-            @(posedge clk);
-            cmd_data = 8'h05; valid = 1; // Read Status
-            @(posedge clk);
-            valid = 0;
-            wait(ready == 1);
-            #10;
-            if (read_data[0] == 1) 
-                $display("[%0t] Flash is still PROGRAMMING...", $time);
-        end while (read_data[0] == 1);
-
-   
-        valid = 0;          
-        wait(ready == 1);   
-        @(posedge clk);     
-        
-        
-        cmd_data     = 8'h03;        
-        address_data = random_address_data; 
-        valid        = 1;   
-
-        @(posedge clk);
-        valid    = 0;
-       
-
-        wait(ready == 1);
-        #10; 
-
-
-        if (read_data == random_write_data) begin
-            $display("---------------------------------------");
-            $display("TEST 4: WRITE");
-            $display("SUCCESS: Received same as Written ", read_data);
-            $display("---------------------------------------");
-        end else begin
-            $error("ERROR: Received %h", read_data);
-        end
-//test end
-
-
-        //duplicated test for test coverage
-
-
-//test start
-        //TEST 4 PURGE AND WRITE 1 BYTE
-
-        //send write enable
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h06;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-   
-        wait(ready == 1);
-        @(posedge clk);
-        //send purge
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h20;
-        address_data = random_address_data;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-        
-        wait(ready == 1);
-        @(posedge clk);
-
-        //wait for purge to be done
-        do begin
-            @(posedge clk);
-            cmd_data = 8'h05; valid = 1; // Read Status
-            @(posedge clk);
-            valid = 0;
-            wait(ready == 1);
-            #10000;
-            if (read_data[0] == 1) 
-                $display("[%0t] Flash is still BUSY...", $time);
-        end while (read_data[0] == 1); 
-        @(posedge clk);
-        //send write enable
-        wait(ready == 1);
-
-        @(posedge clk);
-        
-        cmd_data     = 8'h06;        
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-        $display("[%0t] write enable sent", $time);
-        @(posedge clk);
-        //write data
-        wait(ready == 1);
-
-       
-        
-        cmd_data     = 8'h02;
-        address_data = random_address_data; 
-        write_data = random_write_data;  
-         @(posedge clk);      
-        valid    = 1;
-
-        @(posedge clk);
-        valid    = 0;
-
-        wait(ready == 1);
-
-        do begin
-            @(posedge clk);
-            cmd_data = 8'h05; valid = 1; // Read Status
-            @(posedge clk);
-            valid = 0;
-            wait(ready == 1);
-            #10;
-            if (read_data[0] == 1) 
-                $display("[%0t] Flash is still PROGRAMMING...", $time);
-        end while (read_data[0] == 1);
-
-   
-        valid = 0;          
-        wait(ready == 1);   
-        @(posedge clk);     
-        
-        
-        cmd_data     = 8'h03;        
-        address_data = random_address_data; 
-        valid        = 1;   
-
-        @(posedge clk);
-        valid    = 0;
-       
-
-        wait(ready == 1);
-        #10; 
-
-
-        if (read_data == random_write_data) begin
-            $display("---------------------------------------");
-            $display("TEST 4: WRITE");
-            $display("SUCCESS: Received same as Written ", read_data);
-            $display("---------------------------------------");
-        end else begin
-            $error("ERROR: Received %h", read_data);
-        end
-//test end
-        
-
-
-        $display("[%0t] Simulation finished", $time);
-
-        `uvm_info("TEST","Hello World!",UVM_MEDIUM);
-
-        $finish;
+        vif.rstn = 0;
+        #50 vif.rstn = 1;
     end
 
-
+    initial begin
+        uvm_config_db#(virtual controller_if)::set(null, "*", "vif", vif);
+        run_test("my_base_test");
+    end
+    
 endmodule
