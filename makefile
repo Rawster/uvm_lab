@@ -3,6 +3,7 @@ WAVE = 0
 COV = 0
 DEFINES = -d datain -d statusin -d shortsim
 TEST = base_test
+VERBOSITY = 0
 
 all: simulate
 
@@ -24,10 +25,10 @@ endif
 
 run:
 ifeq ($(WAVE), 1)
-	xsim $(SIM) -testplusarg UVM_TESTNAME=$(TEST) -tclbatch run.tcl 2>&1 | tee run.log
+	xsim $(SIM) -testplusarg UVM_TESTNAME=$(TEST) -testplusarg UVM_VERBOSITY=$(VERBOSITY) -tclbatch run.tcl 2>&1 | tee run.log
 	xsim work.$(SIM).wdb -gui -view wave_conf.wcfg
 else
-	xsim $(SIM) -testplusarg UVM_TESTNAME=$(TEST) -tclbatch run.tcl -R 2>&1 | tee run.log
+	xsim $(SIM) -testplusarg UVM_TESTNAME=$(TEST) -testplusarg UVM_VERBOSITY=$(VERBOSITY) -tclbatch run.tcl 2>&1 | tee run.log
 endif
 
 ifeq ($(COV), 1)

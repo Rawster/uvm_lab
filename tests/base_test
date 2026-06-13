@@ -12,12 +12,26 @@ class base_test extends uvm_test;
     m_env = base_env::type_id::create("m_env", this);
   endfunction
 
-  virtual task run_phase(uvm_phase phase);
-    base_sequence seq;
-    seq = base_sequence::type_id::create("seq");
+virtual task run_phase(uvm_phase phase);
+        base_sequence seq;
 
-    phase.raise_objection(this); 
-    seq.start(m_env.m_agent.m_sequencer);
-    phase.drop_objection(this); 
-  endtask
+        // Podniesienie sprzeciwu (objection), aby symulacja się nie zakończyła
+        phase.raise_objection(this);
+
+        // Utworzenie sekwencji
+        seq = base_sequence::type_id::create("seq");
+
+        // --- TO JEST BRAKUJĄCY KROK ---
+        // Losowanie parametrów sekwencji (w tym num_of_transactions)
+        if (!seq.randomize()) begin
+            `uvm_fatal("TEST", "Błąd randomizacji sekwencji bazowej!")
+        end
+        // ------------------------------
+
+        // Uruchomienie sekwencji na sequencerze
+        seq.start(m_env.m_agent.m_sequencer);
+
+        // Opuszczenie sprzeciwu po zakończeniu sekwencji
+        phase.drop_objection(this);
+    endtask
 endclass
