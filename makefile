@@ -2,7 +2,7 @@ SIM = top_tb
 WAVE = 0
 COV = 0
 DEFINES = -d datain -d statusin -d shortsim
-TEST = base_test
+TEST = base_test.sv
 VERBOSITY = 0
 
 all: simulate
