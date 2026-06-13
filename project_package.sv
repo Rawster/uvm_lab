@@ -5,6 +5,7 @@ package project_package;
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
+`include "env_config.sv"
 `include "uvm_sequence_item.sv"
 `include "seq/uvm_sequence.sv"
 `include "uvm_sequencer.sv"

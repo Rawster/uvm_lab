@@ -40,7 +40,9 @@ class monitor extends uvm_monitor;
             
             item.read_data = vif.read_data;
 
-            `uvm_info("MONITOR", $sformatf("Zlapano: CMD=%0h, READ=%0h", item.command, item.read_data), UVM_LOW)
+            if (item.command != 8'h05) begin
+                `uvm_info("MONITOR", $sformatf("Zlapano: CMD=%0h, READ=%0h", item.command, item.read_data), UVM_LOW)
+            end
 
             
             item_collected_port.write(item);

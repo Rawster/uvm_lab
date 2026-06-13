@@ -1342,14 +1342,14 @@ always @( posedge SSERASE_preset ) begin
         $display (" Error : SMALL SECTOR ERASE failed due to AC violation in the input command sequence.");
         $display ("                                                    (Time=%.3f, %m)",$realtime);
         for ( j = SSERS_START_ADD; j <= SSERS_START_ADD + 7; j = j + 1 ) begin
-          $display ("Flashmemory Address=%h : Data=%h", j, fmemory[j]);
+         // $display ("Flashmemory Address=%h : Data=%h", j, fmemory[j]);
         end
-        $display ("          :");
-        $display ("          :");
-        $display ("          :");
-        $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-1, fmemory[SSERS_END_ADD-1]);
-        $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-0, fmemory[SSERS_END_ADD]);
-        $display ("          ");
+       // $display ("          :");
+       // $display ("          :");
+       // $display ("          :");
+       // $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-1, fmemory[SSERS_END_ADD-1]);
+       // $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-0, fmemory[SSERS_END_ADD]);
+      //  $display ("          ");
         ac_err_com_fg <= 0;
       end
       else if( !write_flag ) begin
@@ -1365,34 +1365,34 @@ always @( posedge SSERASE_preset ) begin
           $display (" Warning : Address=3ffff~20000 is write protected.  (Time=%.3f, %m)",$realtime);
         else if( prot_level == 3'h1 )
           $display (" Warning : Address=3ffff~30000 is write protected.  (Time=%.3f, %m)",$realtime);
-        $display (" SMALL SECTOR ERASE is not executed.");
+       // $display (" SMALL SECTOR ERASE is not executed.");
         for ( j = SSERS_START_ADD; j <= SSERS_START_ADD + 7; j = j + 1 ) begin
-          $display ("Flashmemory Address=%h : Data=%h", j, fmemory[j]);
+         // $display ("Flashmemory Address=%h : Data=%h", j, fmemory[j]);
         end
-        $display ("          :");
-        $display ("          :");
-        $display ("          :");
-        $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-1, fmemory[SSERS_END_ADD-1]);
-        $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-0, fmemory[SSERS_END_ADD]);
-        $display ("          ");
+       // $display ("          :");
+      //  $display ("          :");
+      //  $display ("          :");
+      //  $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-1, fmemory[SSERS_END_ADD-1]);
+      //  $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-0, fmemory[SSERS_END_ADD]);
+      //  $display ("          ");
       end
       else if( write_flag ) begin
         SSERASE = 1;
-        $display (" SMALL SECTOR ERASE started ......  (Time= %.3f, %m)", $realtime);
+      //  $display (" SMALL SECTOR ERASE started ......  (Time= %.3f, %m)", $realtime);
         #tSSE SSERASE <= 0;  
         for ( j = SSERS_START_ADD; j <= SSERS_END_ADD; j = j + 1 ) begin
           fmemory[j] = 8'hFF;
         end
-        $display (" SMALL SECTOR ERASE completed.  (Time= %.3f, %m)", $realtime );
+      //  $display (" SMALL SECTOR ERASE completed.  (Time= %.3f, %m)", $realtime );
         for ( j = SSERS_START_ADD; j <= SSERS_START_ADD + 7; j = j + 1 ) begin
-          $display ("Flashmemory Address=%h : Data=%h", j, fmemory[j]);
+       //   $display ("Flashmemory Address=%h : Data=%h", j, fmemory[j]);
         end
-        $display ("          :");
-        $display ("          :");
-        $display ("          :");
-        $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-1, fmemory[SSERS_END_ADD-1]);
-        $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-0, fmemory[SSERS_END_ADD]);
-        $display ("          ");
+      //  $display ("          :");
+      //  $display ("          :");
+       // $display ("          :");
+      //  $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-1, fmemory[SSERS_END_ADD-1]);
+      //  $display ("Flashmemory Address=%h : Data=%h", SSERS_END_ADD-0, fmemory[SSERS_END_ADD]);
+      //  $display ("          ");
       end
     end
   end
