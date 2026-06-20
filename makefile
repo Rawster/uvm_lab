@@ -3,24 +3,8 @@ WAVE = 0
 COV = 0
 DEFINES = -d datain -d statusin -d shortsim
 TEST = base_test
-VERBOSITY = 0
+VERBOSITY = UVM_LOW
 
-
-ifeq ($(VERBOSITY), 0)
-  UVM_VERB_ARG = UVM_NONE
-else ifeq ($(VERBOSITY), 100)
-  UVM_VERB_ARG = UVM_LOW
-else ifeq ($(VERBOSITY), 200)
-  UVM_VERB_ARG = UVM_MEDIUM
-else ifeq ($(VERBOSITY), 300)
-  UVM_VERB_ARG = UVM_HIGH
-else ifeq ($(VERBOSITY), 400)
-  UVM_VERB_ARG = UVM_FULL
-else ifeq ($(VERBOSITY), 500)
-  UVM_VERB_ARG = UVM_DEBUG
-else
-  UVM_VERB_ARG = $(VERBOSITY)
-endif
 
 all: simulate
 
@@ -42,10 +26,10 @@ endif
 
 run:
 ifeq ($(WAVE), 1)
-	xsim $(SIM) -testplusarg UVM_TESTNAME=$(TEST) -testplusarg UVM_VERBOSITY=$(UVM_VERB_ARG) -tclbatch run.tcl 2>&1 | tee run.log
+	xsim $(SIM) -testplusarg UVM_TESTNAME=$(TEST) -testplusarg UVM_VERBOSITY=$(VERBOSITY) -tclbatch run.tcl 2>&1 | tee run.log
 	xsim work.$(SIM).wdb -gui -view wave_conf.wcfg
 else
-	xsim $(SIM) -testplusarg UVM_TESTNAME=$(TEST) -testplusarg UVM_VERBOSITY=$(UVM_VERB_ARG) -tclbatch run.tcl 2>&1 | tee run.log
+	xsim $(SIM) -testplusarg UVM_TESTNAME=$(TEST) -testplusarg UVM_VERBOSITY=$(VERBOSITY) -tclbatch run.tcl 2>&1 | tee run.log
 endif
 
 ifeq ($(COV), 1)
