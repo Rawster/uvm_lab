@@ -3,7 +3,6 @@ class monitor extends uvm_monitor;
 
   virtual controller_if vif;
   
-  
   uvm_analysis_port #(mem_seq_item) item_collected_port;
 
   function new(string name = "monitor", uvm_component parent = null);
@@ -24,29 +23,44 @@ class monitor extends uvm_monitor;
     forever begin
         @(posedge vif.clk);
         
-        // Złapanie początku transakcji
+        
         if (vif.valid === 1'b1) begin
             item = mem_seq_item::type_id::create("item");
-            item.command = vif.cmd_data;
-            item.address = vif.address_data;
-            item.data    = vif.write_data;
+            item.command   = vif.cmd_data;
+            item.address   = vif.address_data;
+            item.burst_len = vif.burst_len + 1; 
 
             
-            while (vif.ready === 1'b1) @(posedge vif.clk);
-            
-            
-            while (vif.ready === 1'b0) @(posedge vif.clk);
-
-            
-            item.read_data = vif.read_data;
-
-            if (item.command != 8'h05) begin
-                `uvm_info("MONITOR", $sformatf("Zlapano: CMD=%0h, READ=%0h", item.command, item.read_data), UVM_LOW)
+            if (item.command == WRITE_COMMAND) begin
+                item.data = new[item.burst_len];
+                foreach (item.data[i]) begin
+                    item.data[i] = vif.write_data_arr[i];
+                end
             end
 
             
+            while (vif.ready === 1'b1) @(posedge vif.clk);
+            while (vif.ready === 1'b0) @(posedge vif.clk);
+
+            
+            if (item.command == READ_COMMAND) begin
+                item.read_data = new[item.burst_len]; 
+                foreach(item.read_data[i]) begin
+                    item.read_data[i] = vif.read_data_arr[i]; 
+                end
+            end else begin
+               
+                item.read_data = new[1];
+                item.read_data[0] = vif.read_data_arr[0];
+            end
+
+            
+            if (item.command != READ_REGISTER_COMMAND) begin
+                `uvm_info("MONITOR", $sformatf("Zlapano transakcje: CMD=%0h, ADDR=%0h, BURST=%0d", item.command, item.address, item.burst_len), UVM_LOW)
+            end
+
             item_collected_port.write(item);
         end
     end
-endtask
+  endtask
 endclass
