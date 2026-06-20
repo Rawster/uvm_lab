@@ -4,7 +4,6 @@ class base_sequence extends uvm_sequence#(mem_seq_item);
     bit [7:0] shadow_mem [bit [23:0]];
     bit [23:0] known_addrs[$];
 
-    // Enum długości sekwencji
     typedef enum {SINGLE, SHORT, MEDIUM, LONG, MAX} seq_len_e;
     rand seq_len_e seq_length;
     
@@ -36,13 +35,12 @@ class base_sequence extends uvm_sequence#(mem_seq_item);
         int write_cnt = 0;
         int read_cnt = 0;
 
-        `uvm_info("SEQ", $sformatf("Rozpoczynam sekwencje typu: %0s. Ilość transakcji: %0d", seq_length.name(), num_of_transactions), UVM_LOW)
-
+        `uvm_info("SEQ", $sformatf("Rozpoczynam sekwencje typu: %0s. Ilosc transakcji: %0d", seq_length.name(), num_of_transactions), UVM_LOW)
         #100;
 
         for (int i = 0; i < num_of_transactions; i++) begin
             bit is_write;
-            bit [23:0] current_addr; 
+            bit [23:0] current_addr;
             
             req = mem_seq_item::type_id::create("req");
             
@@ -59,22 +57,31 @@ class base_sequence extends uvm_sequence#(mem_seq_item);
 
             start_item(req);
 
-                if (is_write) begin
+            if (is_write) begin
+                bit addr_ok;
+                bit [23:0] temp_addr;
+                int temp_burst;
+                
+                do begin
+                    addr_ok = 1;
+                    temp_addr = $urandom_range(0, 24'h03FFFF);
+                    temp_burst = $urandom_range(1, 256 - (temp_addr & 24'h0000FF));
+
+                    for (int k = 0; k < temp_burst; k++) begin
+                        if ((temp_addr + k) inside {known_addrs}) begin
+                            addr_ok = 0;
+                            break; 
+                        end
+                    end
+                end while (!addr_ok);
                 
                 if (!req.randomize() with { 
-                    command == 8'h02; 
-                    
-                    
-                    address <= (32'h040000 - burst_len);
-                    
-                    
-                    burst_len <= (256 - address[7:0]);
-                    
-                    !(address inside {known_addrs}); 
+                    command == WRITE_COMMAND; 
+                    address == temp_addr; 
+                    burst_len == temp_burst;
                 }) begin
-                    `uvm_error("SEQ", "Błąd randomizacji dla komendy WRITE")
+                    `uvm_fatal("SEQ", "Krytyczny blad randomizacji dla WRITE!") 
                 end
-                
                 
                 foreach (req.data[idx]) begin
                     current_addr = req.address + idx;
@@ -85,33 +92,33 @@ class base_sequence extends uvm_sequence#(mem_seq_item);
                     end
                 end
                 
-                `uvm_info("SEQ", $sformatf("[%0d] Wysłano WRITE BURST -> ADDR: %0h, ILOSC BAJTOW: %0d", i, req.address, req.data.size()), UVM_HIGH)
+                `uvm_info("SEQ", $sformatf("[%0d] Wyslano WRITE BURST -> ADDR: %0h, ILOSC BAJTOW: %0d", i, req.address, req.data.size()), UVM_HIGH)
             end else begin
-                // --- SEKWENCJA READ (BURST) ---
                 bit [23:0] target_addr;
+                int target_burst;
 
                 if (known_addrs.size() > 0 && $urandom_range(0, 1) == 1) begin
                     target_addr = known_addrs[$urandom_range(0, known_addrs.size() - 1)];
                 end else begin
                     target_addr = $urandom_range(0, 24'h03FFFF); 
                 end
+                
+                target_burst = $urandom_range(1, 256 - (target_addr & 24'h0000FF));
 
                 if (!req.randomize() with { 
-                    command == 8'h03; 
+                    command == READ_COMMAND; 
                     address == target_addr; 
-                    
-                    
-                    address <= (32'h040000 - burst_len);
+                    burst_len == target_burst;
                 }) begin
-                    `uvm_error("SEQ", "Błąd randomizacji dla komendy READ")
+                    `uvm_fatal("SEQ", "Krytyczny blad randomizacji dla READ")
                 end
                 
-                `uvm_info("SEQ", $sformatf("[%0d] Wysłano READ BURST  -> ADDR: %0h, ILOSC BAJTOW: %0d", i, req.address, req.burst_len), UVM_HIGH)
+                `uvm_info("SEQ", $sformatf("[%0d] Wyslano READ BURST  -> ADDR: %0h, ILOSC BAJTOW: %0d", i, req.address, req.burst_len), UVM_HIGH)
             end
 
             finish_item(req); 
         end
 
-        `uvm_info("SEQ", $sformatf("Zakończono nadawanie! Wykonano: WRITE = %0d, READ = %0d.", write_cnt, read_cnt), UVM_LOW)
+        `uvm_info("SEQ", $sformatf("Zakonczono nadawanie! Wykonano: WRITE = %0d, READ = %0d.", write_cnt, read_cnt), UVM_LOW)
     endtask
 endclass
