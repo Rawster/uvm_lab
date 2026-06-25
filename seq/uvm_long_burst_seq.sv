@@ -19,7 +19,7 @@ class long_burst_seq extends base_sequence;
 
         
         if (!req.randomize() with { 
-            command == 8'h02; 
+            command == WRITE_COMMAND; 
             address == target_addr; 
             burst_len == max_page_size;
         }) begin
@@ -41,7 +41,7 @@ class long_burst_seq extends base_sequence;
         start_item(req);
 
         if (!req.randomize() with { 
-            command == 8'h03; 
+            command == READ_COMMAND; 
             address == target_addr; 
             burst_len == max_page_size;
         }) begin

@@ -17,7 +17,7 @@ parameter bit [7:0] ENABLE_WRITE_COMMAND = 8'h06;
 `include "uvm_sequence_item.sv"
 `include "seq/uvm_sequence.sv"
 `include "seq/uvm_long_burst_seq.sv"
-`include "seq/uvm_busy_polling_seq.sv"
+`include "seq/uvm_busy_check_seq.sv"
 `include "seq/uvm_err_inject_seq.sv"
 
 `include "uvm_sequencer.sv"
@@ -29,7 +29,7 @@ parameter bit [7:0] ENABLE_WRITE_COMMAND = 8'h06;
 `include "uvm_env.sv"
 `include "tests/base_test.sv"
 `include "tests/uvm_long_burst_test.sv"
-`include "tests/uvm_busy_polling_test.sv"
+`include "tests/uvm_busy_check_test.sv"
 `include "tests/uvm_err_inject_test.sv"
 
 endpackage

@@ -1,6 +1,14 @@
 class base_sequence extends uvm_sequence#(mem_seq_item);
     `uvm_object_utils(base_sequence)
 
+    localparam int PAGE_SIZE = 256;
+    
+    localparam int TX_MIN    = 2;
+    localparam int TX_SHORT  = 10;
+    localparam int TX_MEDIUM = 30;
+    localparam int TX_LONG   = 80;
+    localparam int TX_MAX    = PAGE_SIZE;
+
     bit [7:0] shadow_mem [bit [23:0]];
     bit [23:0] known_addrs[$];
 
@@ -20,11 +28,11 @@ class base_sequence extends uvm_sequence#(mem_seq_item);
     }
 
     constraint c_num_trans {
-        (seq_length == SINGLE) -> num_of_transactions == 2; 
-        (seq_length == SHORT)  -> num_of_transactions inside {[3:10]};
-        (seq_length == MEDIUM) -> num_of_transactions inside {[11:30]};
-        (seq_length == LONG)   -> num_of_transactions inside {[31:80]};
-        (seq_length == MAX)    -> num_of_transactions inside {[81:150]};
+        (seq_length == SINGLE) -> num_of_transactions == TX_MIN; 
+        (seq_length == SHORT)  -> num_of_transactions inside {[3 : TX_SHORT]};
+        (seq_length == MEDIUM) -> num_of_transactions inside {[(TX_SHORT+1) : TX_MEDIUM]};
+        (seq_length == LONG)   -> num_of_transactions inside {[(TX_MEDIUM+1) : TX_LONG]};
+        (seq_length == MAX)    -> num_of_transactions inside {[(TX_LONG+1) : TX_MAX]};
     }
 
     function new(string name = "base_sequence"); 

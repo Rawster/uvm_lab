@@ -6,7 +6,7 @@ TEST = base_test
 VERBOSITY = UVM_LOW
 
 # Lista testów do pełnej regresji
-TESTS_LIST = base_test long_burst_test busy_polling_test err_inject_test
+TESTS_LIST = base_test long_burst_test busy_check_test err_inject_test
 
 all: simulate
 
