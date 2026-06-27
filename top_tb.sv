@@ -9,8 +9,11 @@ interface controller_if(input bit clk);
     logic ready;
     logic [7:0] cmd_data;
     logic [23:0] address_data;
-    logic [7:0] write_data;
-    logic [7:0] read_data;
+    
+    
+    logic [7:0] burst_len;             
+    logic [7:0] write_data_arr [0:255]; 
+    logic [7:0] read_data_arr [0:255];  
 endinterface
 
 module top_tb;
@@ -35,10 +38,12 @@ module top_tb;
         .ready(vif.ready),
         .d_in(vif.cmd_data),
         .d_in_address(vif.address_data),
-        .d_in_data(vif.write_data),
-        .d_out(vif.read_data),
         
-        // PODŁĄCZENIE FIZYCZNEJ MAGISTRALI SPI:
+        
+        .burst_len(vif.burst_len),           
+        .d_in_data_arr(vif.write_data_arr),  
+        .d_out_arr(vif.read_data_arr),       
+        
         .si(spi_si),
         .so(spi_so),
         .sck(spi_sck),

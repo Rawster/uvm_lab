@@ -130,14 +130,24 @@ class driver extends uvm_driver #(mem_seq_item);
                 vif.burst_len    = req.burst_len - 1;
                 
                 
+
+
                 foreach (req.data[i]) begin
                     vif.write_data_arr[i] = req.data[i];
                 end
                 
-                vif.valid        = 1;
+                vif.valid = 1; 
 
-                @(posedge vif.clk); @(posedge vif.clk);
-                vif.valid        = 0;
+                @(posedge vif.clk); 
+
+                
+                if (req.error_inject) begin
+                    `uvm_warning("DRIVER", "INJEKCJA BLEDU ukryta przed Monitorem! Fizyczny sprzęt dostanie zepsute dane.")
+                    vif.write_data_arr[0] = ~vif.write_data_arr[0]; 
+                end
+
+                @(posedge vif.clk); 
+                vif.valid = 0;
                 @(posedge vif.clk); @(posedge vif.clk);
                 wait(vif.ready === 1'b1);
             end

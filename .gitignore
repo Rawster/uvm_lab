@@ -9,3 +9,6 @@ xsim.dir/
 *.str
 report/
 cov_dir/
+venv/
+lab2/__pycache__
+lab2/sim_build
