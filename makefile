@@ -44,10 +44,10 @@ sanity: comp_rtl comp_tb elab
 	@echo "================================================="
 	xsim $(SIM) -testplusarg UVM_TESTNAME=base_test -testplusarg UVM_VERBOSITY=UVM_LOW -tclbatch run.tcl 2>&1 | tee sanity.log
 	@if grep -q -E "UVM_FATAL :[[:space:]]*[1-9]|UVM_ERROR :[[:space:]]*[1-9]" sanity.log; then \
-		echo "-> FAIL: Sanity Check oblal. Sprawdz sanity.log"; \
+		echo "-> FAIL: Sanity Check failed, check sanity.log"; \
 		exit 1; \
 	else \
-		echo "-> PASS: Srodowisko stabilne!"; \
+		echo "-> PASS: Sanity Check passed"; \
 	fi
 
 # --- DODANE: REGRESJA ---
@@ -58,32 +58,32 @@ regression: comp_rtl comp_tb elab
 	@mkdir -p regression_logs
 	@fail_cnt=0; \
 	for test in $(TESTS_LIST); do \
-		echo -n "Uruchamiam test: $$test ... "; \
+		echo -n "Running test: $$test ... "; \
 		xsim $(SIM) -testplusarg UVM_TESTNAME=$$test -testplusarg UVM_VERBOSITY=UVM_LOW -tclbatch run.tcl > regression_logs/$$test.log 2>&1; \
 		\
 		ERR_CNT=$$(grep -E "UVM_FATAL :[[:space:]]*[1-9]|UVM_ERROR :[[:space:]]*[1-9]" regression_logs/$$test.log | wc -l); \
 		\
 		if [ "$$test" = "err_inject_test" ]; then \
 			if [ "$$ERR_CNT" -gt 0 ]; then \
-				echo "PASS (Oczekiwany blad wykryty)"; \
+				echo "PASS (Expected Error Found)"; \
 			else \
-				echo "FAIL (Blad nie zostal wykryty!)"; \
+				echo "FAIL (Expected Error Not Found)"; \
 				fail_cnt=$$((fail_cnt + 1)); \
 			fi; \
 		else \
 			if [ "$$ERR_CNT" -eq 0 ]; then \
 				echo "PASS"; \
 			else \
-				echo "FAIL (Znaleziono niespodziewane bledy!)"; \
+				echo "FAIL (Unexpected errors found!)"; \
 				fail_cnt=$$((fail_cnt + 1)); \
 			fi; \
 		fi; \
 	done; \
 	echo "================================================="; \
 	if [ $$fail_cnt -eq 0 ]; then \
-		echo "SUKCES! Regresja zakonczona."; \
+		echo "SUCCESS. All tests passed."; \
 	else \
-		echo "PORAZKA. Zepsutych testow: $$fail_cnt."; \
+		echo "FAILURE. Failed tests: $$fail_cnt."; \
 		exit 1; \
 	fi
 
